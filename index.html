@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Birthday Celebration</title>
+    <style>
+      /* Countdown styles */
+      #countdown {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 15vw; /* Responsive font size */
+        font-weight: bold;
+        z-index: 1000;
+        animation: zoom 0.5s ease-out, rainbow 1.5s linear infinite;
+        background: linear-gradient(
+          90deg,
+          #ff0000,
+          #ff8000,
+          #ffff00,
+          #00ff00,
+          #00ffff,
+          #0000ff,
+          #8000ff,
+          #ff0080
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        display: none;
+      }
+
+      @keyframes rainbow {
+        0% {
+          background-position: 0% center;
+        }
+        100% {
+          background-position: 200% center;
+        }
+      }
+
+      @keyframes zoom {
+        from {
+          transform: translate(-50%, -50%) scale(0);
+        }
+        to {
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      /* Canvas styles */
+      body {
+        background: #000;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      canvas {
+        cursor: crosshair;
+        display: block;
+      }
+
+      /* Confetti styles */
+      .confetti {
+        position: absolute;
+        width: 1vw; /* Responsive width */
+        height: 1vw; /* Responsive height */
+        background: #fff;
+        animation: confettiFall 3s linear infinite;
+      }
+
+      @keyframes confettiFall {
+        0% {
+          transform: translateY(-100vh) rotate(0deg);
+        }
+        100% {
+          transform: translateY(100vh) rotate(360deg);
+        }
+      }
+
+      /* Birthday Text styles */
+      #birthday-text {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 5vw; /* Moderate responsive font size */
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        z-index: 1000;
+        display: none;
+      }
+
+      /* Button styles */
+      #lets-go-button {
+        position: fixed;
+        top: calc(
+          50% + 11rem
+        ); /* Position below the birthday text with 10rem margin */
+        left: 45%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5vw; /* Even smaller responsive font size */
+        font-weight: bold;
+        color: #fff;
+        background: linear-gradient(
+          90deg,
+          #ff0000,
+          #ff8000,
+          #ffff00,
+          #00ff00,
+          #00ffff,
+          #0000ff,
+          #8000ff,
+          #ff0080
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        border: none;
+        border-radius: 10px;
+        padding: 2px 5px; /* Smaller padding */
+        cursor: pointer;
+        z-index: 1000;
+        display: none;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+        }
+        70% {
+          transform: scale(1.1);
+          box-shadow: 0 0 10px 10px rgba(255, 255, 255, 0);
+        }
+        100% {
+          transform: scale(1);
+          box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        }
+      }
+
+      #lets-go-button:hover {
+        animation: none;
+        transform: scale(1.1);
+        box-shadow: 0 0 10px 10px rgba(255, 255, 255, 0.7);
+      }
+
+      /* Media Queries */
+      @media (max-width: 768px) {
+        #countdown {
+          font-size: 12vw; /* Larger font size on smaller screens */
+        }
+        #birthday-text {
+          font-size: 10vw; /* Larger font size on smaller screens */
+        }
+        #lets-go-button {
+          font-size: 3vw; /* Larger font size on smaller screens */
+          left: 40%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #countdown {
+          font-size: 15vw; /* Even larger font size on very small screens */
+        }
+        #birthday-text {
+          font-size: 10vw; /* Even larger font size on very small screens */
+        }
+        #lets-go-button {
+          font-size: 4vw; /* Even larger font size on very small screens */
+          left: 40%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="countdown">10</div>
+    <div id="birthday-text">HAPPY BIRTHDAY MY DEAR NAME ❤️!!</div>
+    <a href="Cake/Cake.html">
+      <button id="lets-go-button">LET'S GO <3</button>
+    </a>
+    <canvas id="canvas"></canvas>
+
+    <script>
+      // Countdown Implementation
+      let count = 10;
+      const countdown = document.getElementById("countdown");
+      const birthdayText = document.getElementById("birthday-text");
+      const letsGoButton = document.getElementById("lets-go-button");
+
+      function createConfetti() {
+        for (let i = 0; i < 50; i++) {
+          const confetti = document.createElement("div");
+          confetti.className = "confetti";
+          confetti.style.left = Math.random() * 100 + "vw";
+          confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+          confetti.style.animationDelay = Math.random() * 2 + "s";
+          document.body.appendChild(confetti);
+        }
+      }
+
+      function startCountdown() {
+        countdown.style.display = "block";
+
+        const countdownInterval = setInterval(() => {
+          count--;
+          countdown.textContent = count;
+          countdown.style.animation = "none";
+          void countdown.offsetWidth;
+          countdown.style.animation =
+            "zoom 0.5s ease-out, rainbow 1.5s linear infinite";
+
+          if (count <= 0) {
+            clearInterval(countdownInterval);
+            countdown.style.display = "none";
+            birthdayText.style.display = "block"; // Show birthday text
+            letsGoButton.style.display = "block"; // Show button
+            createConfetti();
+            // Remove confetti after 3 seconds
+            setTimeout(() => {
+              document
+                .querySelectorAll(".confetti")
+                .forEach((el) => el.remove());
+            }, 3000);
+            startFireworks();
+          }
+        }, 1000);
+      }
+
+      // Fireworks Implementation
+      function startFireworks() {
+        // Setup animation frame polyfill
+        window.requestAnimFrame = (function () {
+          return (
+            window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            function (callback) {
+              window.setTimeout(callback, 1000 / 60);
+            }
+          );
+        })();
+
+        // Canvas setup
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        let cw = window.innerWidth;
+        let ch = window.innerHeight;
+        canvas.width = cw;
+        canvas.height = ch;
+
+        // Resize canvas on window resize
+        window.addEventListener("resize", () => {
+          cw = window.innerWidth;
+          ch = window.innerHeight;
+          canvas.width = cw;
+          canvas.height = ch;
+        });
+
+        // Fireworks variables
+        let fireworks = [];
+        let particles = [];
+        let hue = 120;
+        let limiterTotal = 5;
+        let limiterTick = 0;
+        let timerTotal = 80;
+        let timerTick = 0;
+        let mousedown = false;
+        let mx, my;
+
+        // Utility functions
+        function random(min, max) {
+          return Math.random() * (max - min) + min;
+        }
+
+        function calculateDistance(p1x, p1y, p2x, p2y) {
+          const xDistance = p1x - p2x;
+          const yDistance = p1y - p2y;
+          return Math.sqrt(xDistance ** 2 + yDistance ** 2);
+        }
+
+        // Firework class
+        function Firework(sx, sy, tx, ty) {
+          this.x = sx;
+          this.y = sy;
+          this.sx = sx;
+          this.sy = sy;
+          this.tx = tx;
+          this.ty = ty;
+          this.distanceToTarget = calculateDistance(sx, sy, tx, ty);
+          this.distanceTraveled = 0;
+          this.coordinates = [];
+          this.coordinateCount = 3;
+          while (this.coordinateCount--) {
+            this.coordinates.push([this.x, this.y]);
+          }
+          this.angle = Math.atan2(ty - sy, tx - sx);
+          this.speed = 2;
+          this.acceleration = 1.05;
+          this.brightness = random(50, 70);
+          this.targetRadius = 1;
+        }
+
+        Firework.prototype.update = function (index) {
+          this.coordinates.pop();
+          this.coordinates.unshift([this.x, this.y]);
+
+          if (this.targetRadius < 8) {
+            this.targetRadius += 0.3;
+          } else {
+            this.targetRadius = 1;
+          }
+
+          this.speed *= this.acceleration;
+          const vx = Math.cos(this.angle) * this.speed;
+          const vy = Math.sin(this.angle) * this.speed;
+
+          this.distanceTraveled = calculateDistance(
+            this.sx,
+            this.sy,
+            this.x + vx,
+            this.y + vy
+          );
+
+          if (this.distanceTraveled >= this.distanceToTarget) {
+            createParticles(this.tx, this.ty);
+            fireworks.splice(index, 1);
+          } else {
+            this.x += vx;
+            this.y += vy;
+          }
+        };
+
+        Firework.prototype.draw = function () {
+          ctx.beginPath();
+          ctx.moveTo(
+            this.coordinates[this.coordinates.length - 1][0],
+            this.coordinates[this.coordinates.length - 1][1]
+          );
+          ctx.lineTo(this.x, this.y);
+          ctx.strokeStyle = `hsl(${hue}, 100%, ${this.brightness}%)`;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(this.tx, this.ty, this.targetRadius, 0, Math.PI * 2);
+          ctx.stroke();
+        };
+
+        // Particle class
+        function Particle(x, y) {
+          this.x = x;
+          this.y = y;
+          this.coordinates = [];
+          this.coordinateCount = 5;
+          while (this.coordinateCount--) {
+            this.coordinates.push([this.x, this.y]);
+          }
+          this.angle = random(0, Math.PI * 2);
+          this.speed = random(1, 10);
+          this.friction = 0.95;
+          this.gravity = 1;
+          this.hue = random(hue - 20, hue + 20);
+          this.brightness = random(50, 80);
+          this.alpha = 1;
+          this.decay = random(0.015, 0.03);
+        }
+
+        Particle.prototype.update = function (index) {
+          this.coordinates.pop();
+          this.coordinates.unshift([this.x, this.y]);
+          this.speed *= this.friction;
+          this.x += Math.cos(this.angle) * this.speed;
+          this.y += Math.sin(this.angle) * this.speed + this.gravity;
+          this.alpha -= this.decay;
+
+          if (this.alpha <= this.decay) {
+            particles.splice(index, 1);
+          }
+        };
+
+        Particle.prototype.draw = function () {
+          ctx.beginPath();
+          ctx.moveTo(
+            this.coordinates[this.coordinates.length - 1][0],
+            this.coordinates[this.coordinates.length - 1][1]
+          );
+          ctx.lineTo(this.x, this.y);
+          ctx.strokeStyle = `hsla(${this.hue}, 100%, ${this.brightness}%, ${this.alpha})`;
+          ctx.stroke();
+        };
+
+        function createParticles(x, y) {
+          for (let i = 0; i < 30; i++) {
+            particles.push(new Particle(x, y));
+          }
+        }
+
+        // Main loop
+        function loop() {
+          requestAnimFrame(loop);
+          hue += 0.5;
+
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+          ctx.fillRect(0, 0, cw, ch);
+          ctx.globalCompositeOperation = "lighter";
+
+          // Update fireworks and particles
+          for (let i = fireworks.length - 1; i >= 0; i--) {
+            fireworks[i].draw();
+            fireworks[i].update(i);
+          }
+
+          for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].draw();
+            particles[i].update(i);
+          }
+
+          // Launch fireworks
+          if (timerTick >= timerTotal) {
+            if (!mousedown) {
+              for (let i = 0; i < 50; i++) {
+                fireworks.push(
+                  new Firework(cw / 2, ch / 2, random(0, cw), random(0, ch))
+                );
+              }
+              timerTick = 0;
+            }
+          } else {
+            timerTick++;
+          }
+
+          if (limiterTick >= limiterTotal) {
+            if (mousedown) {
+              fireworks.push(new Firework(cw / 2, ch / 2, mx, my));
+              limiterTick = 0;
+            }
+          } else {
+            limiterTick++;
+          }
+        }
+
+        // Event listeners
+        canvas.addEventListener("mousemove", function (e) {
+          mx = e.clientX;
+          my = e.clientY;
+        });
+
+        canvas.addEventListener("mousedown", function (e) {
+          e.preventDefault();
+          mousedown = true;
+        });
+
+        canvas.addEventListener("mouseup", function (e) {
+          e.preventDefault();
+          mousedown = false;
+        });
+
+        // Start fireworks loop
+        loop();
+      }
+
+      // Start countdown when page loads
+      window.onload = startCountdown;
+    </script>
+  </body>
+</html>
