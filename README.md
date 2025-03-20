@@ -66,8 +66,9 @@ Edit the message content in index.html:
    </div>
 
 
-##Deployment 🌐
-Host for free using:
+
+## Deployment 🌐
+**Host for free using:**
 
 GitHub Pages
 
@@ -75,14 +76,12 @@ Netlify
 
 Vercel
 
-Firebase Hosting
 
-Deploy to Netlify
 
-Contributing 🤝
+## Contributing 🤝
 Contributions welcome! Follow these steps:
 
-Fork the project
+**Fork the project❤️**
 
 Create your feature branch (git checkout -b feature/AmazingFeature)
 
@@ -92,15 +91,17 @@ Push to branch (git push origin feature/AmazingFeature)
 
 Open a Pull Request
 
-License 📄
+
+
+## License 📄
 MIT License - see LICENSE file for details
 
-Acknowledgments 🙏
-Inspired by birthday celebration websites
+
+
+## Acknowledgments 🙏
 
 Thanks to open source community for awesome libraries
 
-Special thanks to contributors
 
-Happy Celebrating! 🎂🎈
+## Happy Celebrating! 🎂🎈
 Replace the placeholders with your content and make someone's day special!
